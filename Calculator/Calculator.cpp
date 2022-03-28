@@ -24,11 +24,10 @@ void PrintOnScreenAns(double ans)
 
 void Input_Array(double x[N][N])
 {
-	double *ptr;
-		for (int i = 0; i < N; i++) //Ввод матрицы a
+	double arrMax = 20, arrMin = 0;
+		for (int i = 0; i < N; i++) //Ввод матрицы
 			for (int j = 0; j < N; j++)
-				x[i][j] = rand() % 10;
-		ptr = &x[N][N];
+				x[i][j] = arrMin + (arrMax - arrMin) * ((double)rand() / RAND_MAX);
 }
 
 double Addition(double num1, double num2) //Сложение
