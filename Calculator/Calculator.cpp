@@ -40,7 +40,6 @@ void PrintOnScreenAns(double ans) // Вывод ответа в консоль
 
 void Input_Array(double** x, int z, int y) //Ввод рандомной матрицы
 {
-
 	double arrMax = 20, arrMin = 0;
 	for (int i = 0; i < z; i++)
 		for (int j = 0; j < y; j++)
