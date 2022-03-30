@@ -1,33 +1,16 @@
-﻿/*
-Известные проблемы:
-
-1) Хотел сделать по крутому с ручным вводом размеров матриц, но не работает, возможно проблема в передачи переменных, так что я без понятия,
-поэтому DMA и FDMA не будут функциональны. В коде эти функции закомменчены :(
-
-2) После тестирования без DMA и FDMA, вылезла другая проблема: Если отдельно запустить 6ю фунцию 1 раз и 7ю функцию по 1 разу - то всё гуд
-Если же запустить что-то несколько раз (дважды запустить 6 (определитель)) то выдаст исключение... Что-то мне подсказывает что проблема в очитки кучи,
-хотя всё делалось по примеру из презентации
-
-3) микропроблема - не рандомно рандомит arr_X и arr_Y (как пример с остатком 5, генерит 3 и 4 соответсвенно. С остатком 10, генерит 8 и 9 соответсвенно. Эти значения постоянны)
-
-Ну а так, если запускать операции с матрицами по 1 разу, то всё работает)))
-*/
-
-
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
 
-/*
-void DMA(double** memo, int z, int y) // Выделение памяти
+
+double** DMA_2(int z, int y) // Выделение памяти
 {
-	int i = 0;
-	double** memory = (double**)malloc(z * sizeof(double*));
+	double** memo = (double**)malloc(z * sizeof(double*));
 	for (int i = 0; i < z; ++i) {
-		memory[i] = (double*)malloc(y * sizeof(double));
+		memo[i] = (double*)malloc(y * sizeof(double));
 	}
-	memo = memory;
+	return memo;
 }
 
 void FDMA(double** mem, int n) // Очищение памяти
@@ -36,17 +19,18 @@ void FDMA(double** mem, int n) // Очищение памяти
 		free(mem[i]);
 	free(mem);
 }
-*/
+
 void print_matrix(double** x, int z, int y) // Вывод матрицы в консоль
 {
 	for (int i = 0; i < z; i++)
 	{
 		for (int j = 0; j < y; j++)
 		{
-			printf("%lg  ", x[i][j]);
+			printf("%lg ", x[i][j]);
 		}
-		printf("\n\n");
+		printf("\n");
 	}
+	printf("\n");
 }
 
 void PrintOnScreenAns(double ans) // Вывод ответа в консоль
@@ -88,7 +72,6 @@ double Exponentiation(double num1, double num2) //Возведение в сте
 	return pow(num1, num2);;
 }
 
-
 void MatAddition(double** m, double** n, double** res, int z, int y) //Сложение матриц
 {
 	for (int i = 0; i < z; i++)
@@ -110,26 +93,14 @@ double MatDeterminant(double** a) //Определитель матрицы
 
 int main() //Выбор функции
 {
-	srand(NULL);
+	srand(time(NULL));
 	printf("Welcome to a simple calculator.\n\n");
 	const int N = 3;
-	int checkvar = 0, checkvar1 = 0, arr_X = rand() % 5, arr_Y = rand() % 5;
-	double** m1 = (double**)malloc(arr_X * sizeof(double*));
-	for (int i = 0; i < arr_X; ++i) {
-		m1[i] = (double*)malloc(arr_Y * sizeof(double));
-	}
-	double** m2 = (double**)malloc(arr_X * sizeof(double*));
-	for (int i = 0; i < arr_X; ++i) {
-		m2[i] = (double*)malloc(arr_Y * sizeof(double));
-	}
-	double** m3 = (double**)malloc(arr_X * sizeof(double*));
-	for (int i = 0; i < arr_X; ++i) {
-		m3[i] = (double*)malloc(arr_Y * sizeof(double));
-	}
-	double** m4 = (double**)malloc(N * sizeof(double*));
-	for (int i = 0; i < N; ++i) {
-		m4[i] = (double*)malloc(N * sizeof(double));
-	}
+	int checkvar = 0, checkvar1 = 0, arr_X = 0, arr_Y = 0;
+	double** m1 = NULL;
+	double** m2 = NULL;
+	double** m3 = NULL;
+	double** m5 = NULL;
 	double num1 = 0, num2 = 0, ans = 0;
 	do
 	{
@@ -191,15 +162,13 @@ int main() //Выбор функции
 			break;
 
 		case 6:	printf("You have chosen: Matrix Determinant 3x3.\n");
-			//DMA(m4, N, N);
-			Input_Array(m4, N, N);
-			print_matrix(m4, N, N);
+			m5 = DMA_2(N, N);
+			Input_Array(m5, N, N);
+			print_matrix(m5, N, N);
 			printf("\n");
-			ans = MatDeterminant(m4);
+			ans = MatDeterminant(m5);
 			PrintOnScreenAns(ans);
-			for (int i = 0; i < N; i++)
-				free(m4[i]);
-			free(m4);
+			FDMA(m5, N);
 			break;
 
 		case 7:
@@ -209,15 +178,16 @@ int main() //Выбор функции
 				printf("What do you want to choose?\n\n 1 - Addition of matrices\n 2 - Subtraction of matrices\n 0 - return\n\n");
 				scanf_s("%d", &checkvar1);
 
-				//if (checkvar1 != 0)
-				//{
-				//	printf("Enter the size of the matrices\n");
-				//	scanf_s("%d%d", &arr_X, &arr_Y);
-				//	DMA(m1, arr_X, arr_Y);
-				//	DMA(m2, arr_X, arr_Y);
-				//	DMA(m3, arr_X, arr_Y);
-				//}
-				//printf("\n");
+				if (checkvar1 == 1 or checkvar1 == 2)
+				{
+					printf("Enter the size of the matrices\n");
+					scanf_s("%d%d", &arr_X, &arr_Y);
+					m1 = DMA_2(arr_X, arr_Y);
+					m2 = DMA_2(arr_X, arr_Y);
+					m3 = DMA_2(arr_X, arr_Y);
+				}
+
+				printf("\n");
 				switch (checkvar1)
 				{
 				case 0: break;
@@ -232,15 +202,10 @@ int main() //Выбор функции
 					printf("\nAnswer: \n");
 					MatAddition(m1, m2, m3, arr_X, arr_Y);
 					print_matrix(m3, arr_X, arr_Y);
-					for (int i = 0; i < arr_X; i++)
-						free(m1[i]);
-					free(m1);
-					for (int i = 0; i < arr_X; i++)
-						free(m2[i]);
-					free(m2);
-					for (int i = 0; i < arr_X; i++)
-						free(m3[i]);
-					free(m3);
+
+					FDMA(m1, arr_X);
+					FDMA(m2, arr_X);
+					FDMA(m3, arr_X);
 					break;
 
 				case 2:printf("You have chosen: Matrix Subtraction %dx%d.\n", arr_X, arr_Y); //Вычитание матриц
@@ -253,15 +218,9 @@ int main() //Выбор функции
 					printf("\nAnswer: \n");
 					MatSubtraction(m1, m2, m3, arr_X, arr_Y);
 					print_matrix(m3, arr_X, arr_Y);
-					for (int i = 0; i < arr_X; i++)
-						free(m1[i]);
-					free(m1);
-					for (int i = 0; i < arr_X; i++)
-						free(m2[i]);
-					free(m2);
-					for (int i = 0; i < arr_X; i++)
-						free(m3[i]);
-					free(m3);
+					FDMA(m1, arr_X);
+					FDMA(m2, arr_X);
+					FDMA(m3, arr_X);
 					break;
 
 				default: printf("Incorrect number!\n\n");
